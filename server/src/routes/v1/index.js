@@ -2,6 +2,7 @@ const express = require('express');
 const authRoute = require('./auth.route');
 const userRoute = require('./user.route');
 const docsRoute = require('./docs.route');
+const foodRoute = require('./scrapperdata.route')
 const config = require('../../config/config');
 
 const router = express.Router();
@@ -22,6 +23,10 @@ const devRoutes = [
   {
     path: '/docs',
     route: docsRoute,
+  },
+  {
+    path: '/food',
+    route: foodRoute,
   },
 ];
 

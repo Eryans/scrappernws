@@ -6,9 +6,19 @@ const recipeSchema = new mongoose.Schema({
   image: String,
   otherIngredient: [String],
   directions: [String],
-  ingredient: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ingredient' }],
+  ingredients: [
+    {
+      id: {
+        type: String,
+      },
+    },
+  ],
+  ingredientsdb: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Ingredient'
+  }],
 });
 
 const Recipe = mongoose.model('Recipe', recipeSchema);
 
-module.exports = { Ingredient, Recipe };
+module.exports = { Recipe };
