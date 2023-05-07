@@ -23,6 +23,9 @@ Récupère l'ingrédient avec l'identifiant spécifié. Si populate est défini 
 <h2>POST /v1/food/recipes-search-name/:populate</h2>
 
 Recherche les recettes dont le nom contient la chaîne de caractères spécifiée dans le corps de la requête. Si populate est défini à true, les ingrédients de chaque recette seront également récupérés.
+<h2>POST '/recipes-search-ingredient-name/:populate'</h2>
+
+Recherche les recettes dont un ou des ingrédients contiennent la chaîne de caractères spécifiée dans le corps de la requête. Si populate est défini à true, les ingrédients de chaque recette seront également récupérés.
 <h2>POST /v1/food/ingredients-search-name/:populate</h2>
 
 Recherche les ingrédients dont le nom contient la chaîne de caractères spécifiée dans le corps de la requête. Si populate est défini à true, les recettes de chaque ingrédient seront également récupérées.
