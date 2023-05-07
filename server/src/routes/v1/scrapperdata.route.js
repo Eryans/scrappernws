@@ -4,6 +4,42 @@ const Ingredient = require('../../models/Ingredient');
 const ingredients = require('../../scrapper-data/ingredients.json');
 const recipesjson = require('../../scrapper-data/recipes.json');
 const { Recipe } = require('../../models/Recipes');
+const { spawn } = require('child_process');
+const path = require('path');
+
+/**
+ * @swagger
+ * tags:
+ *   name: Food Scrapper
+ *   description: Route d'utilisation des data récupéré avec le scrapper
+ */
+/**
+ * @swagger
+ * /food/scrapper:
+ *   get:
+ *     summary: Execute Le scrapper python
+ *     responses:
+ *       200:
+ *         description: Scrappe terminé
+ */
+
+router.get('/scrapper', (req, res) => {
+  const scrapperPath = path.join(__dirname, '../../scrapper-data/scrapper.py');
+  const scrapperProcess = spawn('python', [scrapperPath]);
+
+  scrapperProcess.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+  });
+
+  scrapperProcess.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+  });
+
+  scrapperProcess.on('close', (code) => {
+    console.log(`child process exited with code ${code}`);
+    return res.status(200).send('Scrapper process finished');
+  });
+});
 
 /**
  * @swagger
@@ -128,7 +164,6 @@ router.post('/recipes', async (req, res) => {
  *       '500':
  *         description: Erreur serveur
  */
-
 
 router.get('/recipes/:populate', async (req, res) => {
   try {
@@ -306,6 +341,104 @@ router.post('/recipes-search-name/:populate', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /food/recipes-search-other-ingredients/{populate}:
+ *   post:
+ *     summary: Recherche de recettes avec un ingrédient autre que ceux dans la liste d'ingrédients principaux
+ *     description: Recherche de recettes contenant un ingrédient autre que ceux dans la liste d'ingrédients principaux, en utilisant une expression régulière pour le nom de l'ingrédient.
+ *     parameters:
+ *       - in: path
+ *         name: populate
+ *         required: true
+ *         description: "Indique si les ingrédients doivent être renvoyés avec les recettes. Valeurs possibles : 'true' ou 'false'"
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: "Nom de l'ingrédient à chercher."
+ *                 example: "beurre"
+ *             required:
+ *               - name
+ *     responses:
+ *       '200':
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/RecipeWithIngredients'
+ *       '500':
+ *         description: Erreur serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+
+router.post('/recipes-search-other-ingredients/:populate', async (req, res) => {
+  try {
+    const allRecipes = await Recipe.find({ otherIngredient: { $regex: req.body.name, $options: 'i' } }).populate(
+      req.params.populate === 'true' ? 'ingredientsdb' : ''
+    );
+    return res.status(200).json(allRecipes);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Erreur lors de la récupération des recettes');
+  }
+});
+
+/**
+ * @swagger
+ * /food/recipes-search-ingredient-name/{populate}:
+ *   post:
+ *     summary: Recherche de recettes par nom d'ingrédient
+ *     description: Renvoie les recettes contenant l'ingrédient dont le nom correspond à la recherche.
+ *     tags:
+ *       - Recettes
+ *     parameters:
+ *       - in: path
+ *         name: populate
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Indique si les ingrédients doivent être populés dans la réponse.
+ *       - in: body
+ *         name: ingredient
+ *         description: Nom de l'ingrédient à rechercher
+ *         schema:
+ *           type: object
+ *           required:
+ *             - name
+ *           properties:
+ *             name:
+ *               type: string
+ *     responses:
+ *       200:
+ *         description: La liste des recettes contenant l'ingrédient recherché
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Recipe'
+ *       500:
+ *         description: Une erreur s'est produite lors de la récupération des recettes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *     security:
+ *       - bearerAuth: []
+ */
 router.post('/recipes-search-ingredient-name/:populate', async (req, res) => {
   try {
     const matchingIngredientIds = await Ingredient.find({ name: { $regex: req.body.name, $options: 'i' } }, '_id');
@@ -335,10 +468,10 @@ router.post('/ingredients-search-name/:populate', async (req, res) => {
 
 /**
  * @swagger
- * /merge-data:
+ * /food/merge-data:
  *   post:
- *     summary: Merge data between ingredients and recipes collections
- *     description: This endpoint merges data between the ingredients and recipes collections by updating the `recipesdb` property of each ingredient document with the corresponding recipes, and updating the `ingredientsdb` property of each recipe document with the corresponding ingredient.
+ *     summary: Fusionner les données entre les collections d'ingrédients et de recettes
+ *     description: Ce point de terminaison fusionne les données entre les collections d'ingrédients et de recettes en mettant à jour la propriété `recipesdb` de chaque document d'ingrédient avec les recettes correspondantes, et en mettant à jour la propriété `ingredientsdb` de chaque document de recette avec l'ingrédient correspondant.
  *     responses:
  *       200:
  *         description: Data merged successfully
