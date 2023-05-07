@@ -76,6 +76,51 @@ router.get('/ingredients/:populate', async (req, res) => {
   }
 });
 
+
+router.get('/recipes/:id/:populate', async (req, res) => {
+  try {
+    const allRecipes = Boolean(req.params.populate) ? await Recipe.findById(req.params.id).populate('ingredientsdb') : await Recipe.findById(req.params.id);
+    return res.status(200).send(allRecipes);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Erreur lors de la récupération des recettes');
+  }
+});
+
+router.get('/ingredients/:id/:populate', async (req, res) => {
+  try {
+    const allIngredients = Boolean(req.params.populate)
+      ? await Ingredient.findById(req.params.id).populate('recipesdb')
+      : await Ingredient.findById(req.params.id);
+
+    return res.status(200).send(allIngredients);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Erreur lors de la récupération des ingrédients');
+  }
+});
+
+
+
+router.post('/recipes-search-name', async (req, res) => {
+  try {
+    const allRecipes = await Recipe.find({ name: { $regex: req.body.name, $options: 'i' } }).populate('ingredientsdb');
+    return res.status(200).json(allRecipes);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Erreur lors de la récupération des recettes');
+  }
+});
+
+router.post('/ingredients-search-name', async (req, res) => {
+  try {
+    const allIngredients = await Ingredient.find({ name: { $regex: req.body.name, $options: 'i' } }).populate('recipesdb');
+    return res.status(200).json(allIngredients);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Erreur lors de la récupération des ingrédients');
+  }
+});
 router.post('/merge-data', async (req, res) => {
   try {
     const allingredients = await Ingredient.find();
