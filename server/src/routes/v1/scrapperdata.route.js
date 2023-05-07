@@ -340,6 +340,62 @@ router.post('/recipes-search-name/:populate', async (req, res) => {
     res.status(500).send('Erreur lors de la récupération des recettes');
   }
 });
+
+/**
+ * @swagger
+ * /food/recipes-search-other-ingredients/{populate}:
+ *   post:
+ *     summary: Recherche de recettes avec un ingrédient autre que ceux dans la liste d'ingrédients principaux
+ *     description: Recherche de recettes contenant un ingrédient autre que ceux dans la liste d'ingrédients principaux, en utilisant une expression régulière pour le nom de l'ingrédient.
+ *     parameters:
+ *       - in: path
+ *         name: populate
+ *         required: true
+ *         description: "Indique si les ingrédients doivent être renvoyés avec les recettes. Valeurs possibles : 'true' ou 'false'"
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: "Nom de l'ingrédient à chercher."
+ *                 example: "beurre"
+ *             required:
+ *               - name
+ *     responses:
+ *       '200':
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/RecipeWithIngredients'
+ *       '500':
+ *         description: Erreur serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+
+router.post('/recipes-search-other-ingredients/:populate', async (req, res) => {
+  try {
+    const allRecipes = await Recipe.find({ otherIngredient: { $regex: req.body.name, $options: 'i' } }).populate(
+      req.params.populate === 'true' ? 'ingredientsdb' : ''
+    );
+    return res.status(200).json(allRecipes);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Erreur lors de la récupération des recettes');
+  }
+});
+
 /**
  * @swagger
  * /food/recipes-search-ingredient-name/{populate}:

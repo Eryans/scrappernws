@@ -29,6 +29,27 @@ Recherche les recettes dont un ou des ingrédients contiennent la chaîne de car
 <h2>POST /v1/food/ingredients-search-name/:populate</h2>
 
 Recherche les ingrédients dont le nom contient la chaîne de caractères spécifiée dans le corps de la requête. Si populate est défini à true, les recettes de chaque ingrédient seront également récupérées.
+<h2>POST /v1/food/recipes-search-other-ingredients/:populate</h2>
+
+Recherche les recettes dont les autres ingrédients de la recette contiennent la chaîne de caractères spécifiée dans le corps de la requête. Si populate est défini à true, les recettes de chaque ingrédient seront également récupérées.
 <h2>POST /v1/food/merge-data</h2>
 
 Fusionne les données des ingrédients et des recettes en associant chaque ingrédient aux recettes qui l'utilisent et vice versa.
+
+
+<h1> Plan de conception pour la base de données : </h1>
+
+<h3>Collection "ingredients" :</h3>
+        id : identifiant unique de l'ingrédient (type String, obligatoire, unique)
+        name : nom de l'ingrédient (type String, obligatoire)
+        recipes : liste d'objets contenant l'identifiant des recettes dans lesquelles l'ingrédient est utilisé (type Array, optionnel)
+        recipesdb : liste d'objets contenant la référence de l'objet Recipe correspondant à la recette dans laquelle l'ingrédient est utilisé (type Array, optionnel)
+
+<h3>Collection "recipes" :</h3>
+        id : identifiant unique de la recette (type String, obligatoire)
+        name : nom de la recette (type String, obligatoire)
+        image : lien vers l'image de la recette (type String, optionnel)
+        otherIngredient : liste de chaînes de caractères contenant les ingrédients autres que les ingrédients principaux (type Array, optionnel)
+        directions : liste de chaînes de caractères contenant les étapes de la préparation de la recette (type Array, optionnel)
+        ingredients : liste d'objets contenant l'identifiant des ingrédients principaux utilisés dans la recette (type Array, optionnel)
+        ingredientsdb : liste d'objets contenant la référence de l'objet Ingredient correspondant à l'ingrédient principal utilisé dans la recette (type Array, optionnel)
