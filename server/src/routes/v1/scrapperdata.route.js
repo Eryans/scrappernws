@@ -81,54 +81,54 @@ router.post('/recipes', async (req, res) => {
 
 /**
  * @swagger
+ *
  * /food/recipes/{populate}:
  *   get:
- *     summary: Récupérer toutes les recettes
- *     tags:
- *       - Recettes
+ *     summary: Récupère toutes les recettes en fonction du paramètre "populate"
+ *     description: Renvoie toutes les recettes en base de données, avec les ingrédients inclus ou non selon la valeur du paramètre "populate"
  *     parameters:
- *       - name: populate
- *         in: path
- *         description: 'true' pour récupérer les ingrédients de chaque recette, rien pour ne pas les récupérer
+ *       - in: path
+ *         name: populate
  *         required: true
  *         schema:
- *           type: boolean
+ *           type: string
+ *         description: Détermine si les ingrédients doivent être inclus dans la réponse (true) ou non (false)
  *     responses:
- *       200:
- *         description: La liste de toutes les recettes
+ *       '200':
+ *         description: OK
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Recipe'
- *       500:
- *         description: Erreur lors de la récupération des recettes
+ *       '500':
+ *         description: Erreur serveur
  *
  * /food/ingredients/{populate}:
  *   get:
- *     summary: Récupérer tous les ingrédients
- *     tags:
- *       - Ingrédients
+ *     summary: Récupère tous les ingrédients en fonction du paramètre "populate"
+ *     description: Renvoie tous les ingrédients en base de données, avec les recettes incluses ou non selon la valeur du paramètre "populate"
  *     parameters:
- *       - name: populate
- *         in: path
- *         description: 'true' pour récupérer les recettes de chaque ingrédient, rien pour ne pas les récupérer
+ *       - in: path
+ *         name: populate
  *         required: true
  *         schema:
- *           type: boolean
+ *           type: string
+ *         description: Détermine si les recettes doivent être incluses dans la réponse (true) ou non (false)
  *     responses:
- *       200:
- *         description: La liste de tous les ingrédients
+ *       '200':
+ *         description: OK
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Ingredient'
- *       500:
- *         description: Erreur lors de la récupération des ingrédients
+ *       '500':
+ *         description: Erreur serveur
  */
+
 
 router.get('/recipes/:populate', async (req, res) => {
   try {
