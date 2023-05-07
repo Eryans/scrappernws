@@ -55,7 +55,7 @@ router.post('/recipes', async (req, res) => {
 
 router.get('/recipes/:populate', async (req, res) => {
   try {
-    const allRecipes = Boolean(req.params.populate) ? await Recipe.find().populate('ingredientsdb') : await Recipe.find();
+    const allRecipes = await Recipe.find().populate(req.params.populate === 'true' ? 'ingredientsdb' : '');
     return res.status(200).send(allRecipes);
   } catch (error) {
     console.log(error);
@@ -65,9 +65,8 @@ router.get('/recipes/:populate', async (req, res) => {
 
 router.get('/ingredients/:populate', async (req, res) => {
   try {
-    const allIngredients = Boolean(req.params.populate)
-      ? await Ingredient.find().populate('recipesdb')
-      : await Ingredient.find();
+    console.log(req.params.populate);
+    const allIngredients = await Ingredient.find().populate(req.params.populate === 'true' ? 'recipesdb' : '');
 
     return res.status(200).send(allIngredients);
   } catch (error) {
@@ -76,11 +75,10 @@ router.get('/ingredients/:populate', async (req, res) => {
   }
 });
 
-
 router.get('/recipes/:id/:populate', async (req, res) => {
   try {
-    const allRecipes = Boolean(req.params.populate) ? await Recipe.findById(req.params.id).populate('ingredientsdb') : await Recipe.findById(req.params.id);
-    return res.status(200).send(allRecipes);
+    const recipe = await Recipe.findById(req.params.id).populate(req.params.populate === 'true' ? 'ingredientsdb' : '');
+    return res.status(200).send(recipe);
   } catch (error) {
     console.log(error);
     res.status(500).send('Erreur lors de la récupération des recettes');
@@ -89,22 +87,21 @@ router.get('/recipes/:id/:populate', async (req, res) => {
 
 router.get('/ingredients/:id/:populate', async (req, res) => {
   try {
-    const allIngredients = Boolean(req.params.populate)
-      ? await Ingredient.findById(req.params.id).populate('recipesdb')
-      : await Ingredient.findById(req.params.id);
+    const ingredient = await Ingredient.findById(req.params.id).populate(req.params.populate === 'true' ? 'recipesdb' : '');
 
-    return res.status(200).send(allIngredients);
+    console.log(ingredient);
+    return res.status(200).send(ingredient);
   } catch (error) {
     console.log(error);
     res.status(500).send('Erreur lors de la récupération des ingrédients');
   }
 });
 
-
-
-router.post('/recipes-search-name', async (req, res) => {
+router.post('/recipes-search-name/:populate', async (req, res) => {
   try {
-    const allRecipes = await Recipe.find({ name: { $regex: req.body.name, $options: 'i' } }).populate('ingredientsdb');
+    const allRecipes = await Recipe.find({ name: { $regex: req.body.name, $options: 'i' } }).populate(
+      req.params.populate === 'true' ? 'ingredientsdb' : ''
+    );
     return res.status(200).json(allRecipes);
   } catch (error) {
     console.log(error);
@@ -112,9 +109,11 @@ router.post('/recipes-search-name', async (req, res) => {
   }
 });
 
-router.post('/ingredients-search-name', async (req, res) => {
+router.post('/ingredients-search-name/:populate', async (req, res) => {
   try {
-    const allIngredients = await Ingredient.find({ name: { $regex: req.body.name, $options: 'i' } }).populate('recipesdb');
+    const allIngredients = await Ingredient.find({ name: { $regex: req.body.name, $options: 'i' } }).populate(
+      req.params.populate === 'true' ? 'recipesdb' : ''
+    );
     return res.status(200).json(allIngredients);
   } catch (error) {
     console.log(error);
