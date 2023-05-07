@@ -3,7 +3,9 @@ import re
 import requests
 from bs4 import BeautifulSoup
 import sys
-
+import hashlib
+import os
+import json
 # Set default encoding to utf-8
 sys.stdout.reconfigure(encoding='utf-8')
 # URL de la page à scraper
@@ -26,7 +28,7 @@ ingredients = []
 recipes = []
 # Ajouter un objet avec la propriété 'name' pour chaque élément <a>
 for tag in a_tags:
-    ingredienthashedid = hash(tag.text.strip())
+    ingredienthashedid = hashlib.sha256(tag['href'].encode()).hexdigest()
     ingredient = {'id': ingredienthashedid,
                   'name': tag.text.strip(), 'recipes': []}
     print("scrapping :", tag['href'])
@@ -46,7 +48,7 @@ for tag in a_tags:
             recipe_id = recipe_id.split('_')[-1]
         image_tag = recipe_link.find(
             'img', {'class': 'card__img'}).get('data-src', '')
-        recipehashforid = hash(recipe_link['href'])
+        recipehashforid = hashlib.sha256(recipe_link['href'].encode()).hexdigest()
         print("scrapping :", recipe_link['href'])
 
         recipe_search_url = recipe_link['href']
@@ -75,7 +77,6 @@ for tag in a_tags:
                         [span.text.strip() for span in spans])
                     # Ajouter le texte des ingrédients à la liste other_ingredients
                     other_ingredients.append(ingredients_text)
-                    print(ingredients_text)
 
         # Si la liste des directions est trouvée, extraire le contenu de chaque élément li
         if directions_list:
@@ -86,7 +87,6 @@ for tag in a_tags:
                 # Extraire le texte de l'élément li et ajouter à la liste des directions
                 directions_text = item.text.strip()
                 directions.append(directions_text)
-                print(directions_text)
 
         recipe = {'id': recipehashforid, 'name': recipe_link.find('span', {'class': 'card__title'}).text.strip(
         ), 'image': image_tag, 'otherIngredient': other_ingredients, 'directions': directions}
@@ -112,10 +112,15 @@ for tag in a_tags:
     else:
         ingredients.append(ingredient)
 
-# Enregistrer les données dans un fichier JSON
-with open('ingredients.json', 'w') as f:
+
+
+# Obtenez le chemin absolu du répertoire contenant le script Python en cours d'exécution
+script_dir = os.path.dirname(__file__)
+
+# Enregistrer les données dans un fichier JSON dans le même répertoire que le script
+with open(os.path.join(script_dir, 'ingredients.json'), 'w') as f:
     json.dump(ingredients, f)
 
-# Enregistrer les données dans un deuxième fichier JSON
-with open('recipes.json', 'w') as f:
+# Enregistrer les données dans un deuxième fichier JSON dans le même répertoire que le script
+with open(os.path.join(script_dir, 'recipes.json'), 'w') as f:
     json.dump(recipes, f)
