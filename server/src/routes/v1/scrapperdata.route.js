@@ -5,7 +5,6 @@ const ingredients = require('../../scrapper-data/ingredients.json');
 const recipesjson = require('../../scrapper-data/recipes.json');
 const { Recipe } = require('../../models/Recipes');
 
-
 /**
  * @swagger
  * /food/ingredients:
@@ -105,7 +104,7 @@ router.post('/recipes', async (req, res) => {
  *                 $ref: '#/components/schemas/Recipe'
  *       500:
  *         description: Erreur lors de la récupération des recettes
- * 
+ *
  * /food/ingredients/{populate}:
  *   get:
  *     summary: Récupérer tous les ingrédients
@@ -140,7 +139,6 @@ router.get('/recipes/:populate', async (req, res) => {
     res.status(500).send('Erreur lors de la récupération des recettes');
   }
 });
-
 
 router.get('/ingredients/:populate', async (req, res) => {
   try {
@@ -181,7 +179,7 @@ router.get('/ingredients/:populate', async (req, res) => {
  *               $ref: '#/components/schemas/Recipe'
  *       500:
  *         description: Erreur lors de la récupération de la recette.
- * 
+ *
  * /food/ingredients/{id}/{populate}:
  *   get:
  *     summary: Récupère un ingrédient par ID avec les informations liées.
@@ -208,8 +206,6 @@ router.get('/ingredients/:populate', async (req, res) => {
  *       500:
  *         description: Erreur lors de la récupération de l'ingrédient.
  */
-
-
 
 router.get('/recipes/:id/:populate', async (req, res) => {
   try {
@@ -265,7 +261,7 @@ router.get('/ingredients/:id/:populate', async (req, res) => {
  *                 $ref: '#/components/schemas/Recipe'
  *       500:
  *         description: Internal Server Error
- * 
+ *
  * /food/ingredients-search-name/{populate}:
  *   post:
  *     summary: Rechercher des ingrédients par nom
@@ -298,13 +294,26 @@ router.get('/ingredients/:id/:populate', async (req, res) => {
  *         description: Internal Server Error
  */
 
-
-
 router.post('/recipes-search-name/:populate', async (req, res) => {
   try {
     const allRecipes = await Recipe.find({ name: { $regex: req.body.name, $options: 'i' } }).populate(
       req.params.populate === 'true' ? 'ingredientsdb' : ''
     );
+    return res.status(200).json(allRecipes);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Erreur lors de la récupération des recettes');
+  }
+});
+
+router.post('/recipes-search-ingredient-name/:populate', async (req, res) => {
+  try {
+    const matchingIngredientIds = await Ingredient.find({ name: { $regex: req.body.name, $options: 'i' } }, '_id');
+    console.log(matchingIngredientIds);
+    const allRecipes = await Recipe.find({ ingredientsdb: { $elemMatch: { $in: matchingIngredientIds } } }).populate(
+      req.params.populate === 'true' ? 'ingredientsdb' : ''
+    );
+
     return res.status(200).json(allRecipes);
   } catch (error) {
     console.log(error);
@@ -337,7 +346,6 @@ router.post('/ingredients-search-name/:populate', async (req, res) => {
  *         description: Error while merging data
  */
 
-
 router.post('/merge-data', async (req, res) => {
   try {
     const allingredients = await Ingredient.find();
@@ -360,4 +368,3 @@ router.post('/merge-data', async (req, res) => {
   }
 });
 module.exports = router;
-
