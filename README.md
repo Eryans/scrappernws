@@ -40,16 +40,20 @@ Fusionne les données des ingrédients et des recettes en associant chaque ingr�
 <h1> Plan de conception pour la base de données : </h1>
 
 <h3>Collection "ingredients" :</h3>
-        id : identifiant unique de l'ingrédient (type String, obligatoire, unique)
-        name : nom de l'ingrédient (type String, obligatoire)
-        recipes : liste d'objets contenant l'identifiant des recettes dans lesquelles l'ingrédient est utilisé (type Array, optionnel)
-        recipesdb : liste d'objets contenant la référence de l'objet Recipe correspondant à la recette dans laquelle l'ingrédient est utilisé (type Array, optionnel)
+        <ul>
+          <li>id : identifiant unique de l'ingrédient (type String, obligatoire, unique)</li>
+            <li>name : nom de l'ingrédient (type String, obligatoire)</li>
+            <li>recipes : liste d'objets contenant l'identifiant des recettes dans lesquelles l'ingrédient est utilisé (type Array, optionnel)</li>
+            <li>recipesdb : liste d'objets contenant la référence de l'objet Recipe correspondant à la recette dans laquelle l'ingrédient est utilisé (type Array, optionnel)</li>
+        </ul>
 
 <h3>Collection "recipes" :</h3>
-        id : identifiant unique de la recette (type String, obligatoire)
-        name : nom de la recette (type String, obligatoire)
-        image : lien vers l'image de la recette (type String, optionnel)
-        otherIngredient : liste de chaînes de caractères contenant les ingrédients autres que les ingrédients principaux (type Array, optionnel)
-        directions : liste de chaînes de caractères contenant les étapes de la préparation de la recette (type Array, optionnel)
-        ingredients : liste d'objets contenant l'identifiant des ingrédients principaux utilisés dans la recette (type Array, optionnel)
-        ingredientsdb : liste d'objets contenant la référence de l'objet Ingredient correspondant à l'ingrédient principal utilisé dans la recette (type Array, optionnel)
+    <ul>
+        <li>id : identifiant unique de la recette (type String, obligatoire)</li>
+        <li>name : nom de la recette (type String, obligatoire)</li>
+        <li>image : lien vers l'image de la recette (type String, optionnel)</li>
+        <li>otherIngredient : liste de chaînes de caractères contenant les ingrédients autres que les ingrédients principaux (type Array, optionnel)</li>
+        <li>directions : liste de chaînes de caractères contenant les étapes de la préparation de la recette (type Array, optionnel)</li>
+        <li>ingredients : liste d'objets contenant l'identifiant des ingrédients principaux utilisés dans la recette (type Array, optionnel)</li>
+        <li>ingredientsdb : liste d'objets contenant la référence de l'objet Ingredient correspondant à l'ingrédient principal utilisé dans la recette (type Array, optionnel)</li>
+    </ul>
